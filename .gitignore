@@ -1,0 +1,15 @@
+# Machine-specific configuration
+hostname.local
+username.local
+
+# Nix build outputs
+result
+result-*
+
+# Editor files
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
