@@ -12,13 +12,8 @@ let
     else "admin";  # Fallback
 in
 {
-  # Nix configuration
-  nix = {
-    settings = {
-      experimental-features = [ "nix-command" "flakes" ];
-      trusted-users = [ "@admin" username ];
-    };
-  };
+  # Let Determinate Nix installer manage Nix (don't conflict with nix-darwin)
+  nix.enable = false;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
