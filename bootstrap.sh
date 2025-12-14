@@ -173,10 +173,13 @@ else
     darwin-rebuild switch --flake ".#$PROFILE"
 fi
 
+# Install auto-update daemon
+log_info "Installing auto-update daemon..."
+"$NIX_CONFIG_DIR/update.sh" --install "$PROFILE"
+
 log_info "Bootstrap complete!"
 log_info "Profile '$PROFILE' has been activated."
 log_info ""
 log_info "Next steps:"
 log_info "  1. Restart your terminal to apply shell changes"
 log_info "  2. Run 'sudo darwin-rebuild switch --flake /etc/nix-darwin#$PROFILE' to apply future changes"
-log_info "  3. Set up auto-update by running: sudo /etc/nix-darwin/update.sh --install"

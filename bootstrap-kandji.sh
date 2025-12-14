@@ -184,5 +184,9 @@ else
     darwin-rebuild switch --flake ".#$PROFILE"
 fi
 
+# Install auto-update daemon
+log_info "Installing auto-update daemon..."
+"$NIX_CONFIG_DIR/update.sh" --install "$PROFILE"
+
 log_info "Kandji bootstrap complete!"
 log_info "Profile '$PROFILE' activated for user '$TARGET_USER'"
