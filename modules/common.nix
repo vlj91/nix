@@ -63,7 +63,7 @@ in
     ripgrep
     fd
     bat
-    eza  # modern ls replacement
+    eza
     fzf
 
     # Compression
@@ -75,7 +75,7 @@ in
     openssh
   ];
 
-  # Zsh configuration with Oh My Zsh
+  # Zsh configuration
   programs.zsh = {
     enable = true;
     enableCompletion = true;
@@ -84,36 +84,15 @@ in
     enableFzfHistory = true;
     enableSyntaxHighlighting = true;
 
-    # Oh My Zsh configuration
-    ohMyZsh = {
-      enable = true;
-      plugins = [
-        "git"
-        "sudo"
-        "history"
-        "direnv"
-        "fzf"
-      ];
-      theme = "robbyrussell";
-    };
-
-    # Shell initialization
     interactiveShellInit = ''
-      # Additional shell configuration
       export EDITOR="vim"
       export VISUAL="vim"
-
-      # Better history
       export HISTSIZE=10000
       export SAVEHIST=10000
 
-      # Aliases
       alias ll="eza -la"
       alias la="eza -a"
       alias l="eza"
-      alias cat="bat --paging=never"
-      alias grep="rg"
-      alias find="fd"
     '';
   };
 
