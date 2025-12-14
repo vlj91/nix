@@ -19,4 +19,9 @@ in
     localHostName = hostname;
   };
 
+  # Install orchard for VM orchestration and colima for containers
+  environment.systemPackages = [
+    pkgs.orchard
+    pkgs.colima
+  ];
 }
