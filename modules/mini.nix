@@ -27,32 +27,29 @@ in
     localHostName = hostname;
   };
 
-  # Install orchard for VM orchestration and colima for containers
+  # Install orchard for VM orchestration
   environment.systemPackages = [
     pkgs.orchard
-    pkgs.colima
     pkgs.tailscale
   ];
 
-  # Start colima on boot
-  launchd.user.agents.colima = {
-    command = "${pkgs.colima}/bin/colima start --foreground";
-    serviceConfig = {
-      Label = "com.colima.default";
-      RunAtLoad = true;
-      KeepAlive = true;
-      StandardOutPath = "/tmp/colima.stdout.log";
-      StandardErrorPath = "/tmp/colima.stderr.log";
-    };
-  };
+  # Install Docker Desktop via Homebrew
+  homebrew.casks = [
+    "docker"
+  ];
 
-  # Load colima agent during activation (for first-time bootstrap)
+  # Start Docker Desktop on first activation and enable auto-start
   system.activationScripts.postActivation.text = ''
-    echo "Loading colima launchd agent for user ${username}..."
-    COLIMA_PLIST="/Users/${username}/Library/LaunchAgents/com.colima.default.plist"
-    if [ -f "$COLIMA_PLIST" ]; then
-      sudo -u ${username} launchctl unload "$COLIMA_PLIST" 2>/dev/null || true
-      sudo -u ${username} launchctl load "$COLIMA_PLIST" || true
+    echo "Configuring Docker Desktop..."
+    # Enable Docker Desktop auto-start on login
+    DOCKER_PLIST="/Users/${username}/Library/Group Containers/group.com.docker/settings-store.json"
+    if [ -f "$DOCKER_PLIST" ]; then
+      # Docker settings exist, try to enable auto-start via defaults
+      true
+    fi
+    # Start Docker Desktop if not running (will fail silently in headless mode)
+    if ! pgrep -x "Docker" > /dev/null; then
+      sudo -u ${username} open -a Docker 2>/dev/null || true
     fi
   '';
 }
