@@ -31,6 +31,9 @@
 
         # Develop profile - extends mini with development tools
         develop = mkDarwinConfig { profile = "develop"; };
+
+        # iOS builder profile - for CI/CD iOS builds with tart
+        ios-builder = mkDarwinConfig { profile = "ios-builder"; };
       };
 
       # Expose packages for both architectures

@@ -13,14 +13,14 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # Configuration
 REPO_URL="${REPO_URL:-https://github.com/vlj91/nix.git}"
-NIX_CONFIG_DIR="${NIX_CONFIG_DIR:-$HOME/.config/nix-darwin}"
+NIX_CONFIG_DIR="/etc/nix-darwin"
 
 # Parse arguments
 PROFILE="${1:-mini}"
 
-if [[ "$PROFILE" != "mini" && "$PROFILE" != "develop" ]]; then
+if [[ "$PROFILE" != "mini" && "$PROFILE" != "develop" && "$PROFILE" != "ios-builder" ]]; then
     log_error "Invalid profile: $PROFILE"
-    echo "Usage: $0 [mini|develop]"
+    echo "Usage: $0 [mini|develop|ios-builder]"
     exit 1
 fi
 
@@ -31,6 +31,39 @@ if [[ "$(uname)" != "Darwin" ]]; then
     log_error "This script only runs on macOS"
     exit 1
 fi
+
+# Check for root/sudo for system directory access
+if [[ "$(id -u)" -ne 0 ]]; then
+    log_error "This script requires root privileges. Run with sudo."
+    exit 1
+fi
+
+# Determine the target user based on profile
+determine_user() {
+    if [[ "$PROFILE" == "mini" ]]; then
+        # Mini profile always uses "mini" user (created by nix-darwin)
+        echo "mini"
+    else
+        # For develop/ios-builder profiles, find the single user in /Users (excluding system dirs)
+        local users
+        users=$(ls -1 /Users | grep -v "^Shared$" | grep -v "^\." | grep -v "^Guest$")
+        local user_count
+        user_count=$(echo "$users" | wc -l | tr -d ' ')
+
+        if [[ "$user_count" -eq 1 ]]; then
+            echo "$users"
+        elif [[ -n "$SUDO_USER" ]]; then
+            echo "$SUDO_USER"
+        else
+            log_error "Could not determine user for $PROFILE profile"
+            log_error "Found users: $users"
+            exit 1
+        fi
+    fi
+}
+
+ACTUAL_USER=$(determine_user)
+log_info "Configuring for user: $ACTUAL_USER"
 
 # Install Xcode Command Line Tools if not present (non-interactive)
 if ! xcode-select -p &>/dev/null; then
@@ -105,22 +138,21 @@ if ! command -v nix &>/dev/null; then
 fi
 
 # Clone or update the nix config repository
-if [[ -d "$NIX_CONFIG_DIR" ]]; then
+if [[ -d "$NIX_CONFIG_DIR/.git" ]]; then
     log_info "Updating existing nix-darwin configuration..."
-    cd "$NIX_CONFIG_DIR"
-    git pull origin main || git pull origin master || true
+    git -C "$NIX_CONFIG_DIR" pull origin main || git -C "$NIX_CONFIG_DIR" pull origin master || true
 else
     log_info "Cloning nix-darwin configuration..."
+    rm -rf "$NIX_CONFIG_DIR"
     git clone "$REPO_URL" "$NIX_CONFIG_DIR"
-    cd "$NIX_CONFIG_DIR"
 fi
 
 # Generate local configuration files
 log_info "Generating local configuration..."
 
 # Save current username for nix-homebrew
-echo "$USER" > "$NIX_CONFIG_DIR/username.local"
-log_info "Username: $USER"
+echo "$ACTUAL_USER" > "$NIX_CONFIG_DIR/username.local"
+log_info "Username: $ACTUAL_USER"
 
 # Generate hostname.local for mini profile
 if [[ "$PROFILE" == "mini" ]]; then
@@ -131,8 +163,13 @@ if [[ "$PROFILE" == "mini" ]]; then
     log_info "Hostname will be set to: $HOSTNAME"
 fi
 
+# Save current profile
+echo "$PROFILE" > "$NIX_CONFIG_DIR/.current-profile"
+
 # Build and switch to the configuration
 log_info "Building and activating nix-darwin configuration..."
+
+cd "$NIX_CONFIG_DIR"
 
 # First time setup - need to bootstrap nix-darwin
 if ! command -v darwin-rebuild &>/dev/null; then
@@ -147,5 +184,5 @@ log_info "Profile '$PROFILE' has been activated."
 log_info ""
 log_info "Next steps:"
 log_info "  1. Restart your terminal to apply shell changes"
-log_info "  2. Run 'darwin-rebuild switch --flake ~/.config/nix-darwin#$PROFILE' to apply future changes"
-log_info "  3. Set up auto-update by running: ./update.sh --install"
+log_info "  2. Run 'sudo darwin-rebuild switch --flake /etc/nix-darwin#$PROFILE' to apply future changes"
+log_info "  3. Set up auto-update by running: sudo /etc/nix-darwin/update.sh --install"

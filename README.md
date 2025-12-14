@@ -1,48 +1,65 @@
 # nix-darwin
 
-Nix-darwin configuration with two profiles: `mini` and `develop`.
+Nix-darwin configuration with three profiles: `mini`, `develop`, and `ios-builder`.
 
 ## Profiles
 
 | Profile | Description |
 |---------|-------------|
-| `mini` | Minimal setup with basic shell tools. Sets hostname to `mini-${serial_number}`. |
-| `develop` | Extends mini with asdf version manager. Preserves existing hostname. |
+| `mini` | Minimal setup. Creates `mini` user, sets hostname to `mini-${serial_number}`. |
+| `develop` | Extends mini with asdf. Auto-detects the single user in `/Users`. Preserves hostname. |
+| `ios-builder` | For iOS CI/CD. Installs tart. Auto-detects user. Preserves hostname. |
 
 ## Bootstrap
 
-Run on a fresh macOS machine:
+### Manual (with sudo)
 
 ```bash
-# Mini profile
-curl -fsSL https://raw.githubusercontent.com/vlj91/nix/main/bootstrap.sh | bash -s mini
-
-# Develop profile
-curl -fsSL https://raw.githubusercontent.com/vlj91/nix/main/bootstrap.sh | bash -s develop
+curl -fsSL https://raw.githubusercontent.com/vlj91/nix/main/bootstrap.sh -o /tmp/bootstrap.sh
+sudo bash /tmp/bootstrap.sh mini    # or develop
 ```
+
+### Via Kandji
+
+Upload `bootstrap-kandji.sh` to Kandji and configure it to run as a Custom Script.
+
+```bash
+# Kandji will run as root and detect the console user automatically
+/path/to/bootstrap-kandji.sh mini   # or develop
+```
+
+## Configuration Location
+
+All configuration is stored in `/etc/nix-darwin/`:
+- `flake.nix` - Main configuration
+- `username.local` - Console user (for Homebrew)
+- `hostname.local` - Hostname (mini profile only)
+- `.current-profile` - Active profile
 
 ## Auto-updates
 
 Enable automatic updates (polls git remote hourly):
 
 ```bash
-~/.config/nix-darwin/update.sh --install
+sudo /etc/nix-darwin/update.sh --install
 ```
 
 Other commands:
 
 ```bash
-./update.sh --check        # Check and apply updates now
-./update.sh --status       # Show status
-./update.sh --uninstall    # Disable auto-updates
+sudo /etc/nix-darwin/update.sh --check        # Check and apply updates now
+/etc/nix-darwin/update.sh --status            # Show status
+sudo /etc/nix-darwin/update.sh --uninstall    # Disable auto-updates
 ```
+
+Logs: `/var/log/nix-darwin-update.log`
 
 ## Manual rebuild
 
 ```bash
-darwin-rebuild switch --flake ~/.config/nix-darwin#mini
+sudo darwin-rebuild switch --flake /etc/nix-darwin#mini
 # or
-darwin-rebuild switch --flake ~/.config/nix-darwin#develop
+sudo darwin-rebuild switch --flake /etc/nix-darwin#develop
 ```
 
 ## Adding Homebrew packages
