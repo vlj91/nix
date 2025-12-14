@@ -27,29 +27,27 @@ in
     localHostName = hostname;
   };
 
-  # Install orchard for VM orchestration
+  # Install orchard for VM orchestration and podman for containers
   environment.systemPackages = [
     pkgs.orchard
     pkgs.tailscale
+    pkgs.podman
+    pkgs.podman-compose
+    pkgs.qemu
   ];
 
-  # Install Docker Desktop via Homebrew
-  homebrew.casks = [
-    "docker"
-  ];
-
-  # Start Docker Desktop on first activation and enable auto-start
+  # Initialize and start podman machine on activation
   system.activationScripts.postActivation.text = ''
-    echo "Configuring Docker Desktop..."
-    # Enable Docker Desktop auto-start on login
-    DOCKER_PLIST="/Users/${username}/Library/Group Containers/group.com.docker/settings-store.json"
-    if [ -f "$DOCKER_PLIST" ]; then
-      # Docker settings exist, try to enable auto-start via defaults
-      true
+    echo "Configuring podman..."
+    # Initialize podman machine if not exists
+    if ! sudo -u ${username} podman machine list 2>/dev/null | grep -q "podman-machine-default"; then
+      echo "Initializing podman machine..."
+      sudo -u ${username} podman machine init || true
     fi
-    # Start Docker Desktop if not running (will fail silently in headless mode)
-    if ! pgrep -x "Docker" > /dev/null; then
-      sudo -u ${username} open -a Docker 2>/dev/null || true
+    # Start podman machine if not running
+    if ! sudo -u ${username} podman machine list 2>/dev/null | grep -q "Running"; then
+      echo "Starting podman machine..."
+      sudo -u ${username} podman machine start || true
     fi
   '';
 }
