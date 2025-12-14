@@ -123,6 +123,6 @@ in
     };
   };
 
-  # Enable touch ID for sudo
-  security.pam.enableSudoTouchIdAuth = true;
+  # Set primary user for user-specific options (homebrew, system defaults, etc.)
+  system.primaryUser = username;
 }
