@@ -14,7 +14,7 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 # Configuration
 NIX_CONFIG_DIR="/etc/nix-darwin"
 PROFILE_FILE="$NIX_CONFIG_DIR/.current-profile"
-POLL_INTERVAL="${POLL_INTERVAL:-3600}"  # Default: 1 hour
+POLL_INTERVAL="${POLL_INTERVAL:-300}"  # Default: 5 minutes
 LAUNCHD_LABEL="com.nix-darwin.update"
 LAUNCHD_PLIST="/Library/LaunchDaemons/$LAUNCHD_LABEL.plist"
 
