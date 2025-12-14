@@ -19,15 +19,4 @@ in
     localHostName = hostname;
   };
 
-  # Create the mini user
-  users.users.mini = {
-    name = "mini";
-    uid = 501;
-    home = "/Users/mini";
-    shell = pkgs.zsh;
-    description = "Mini User";
-  };
-
-  # Ensure nix-darwin manages this user
-  users.knownUsers = [ "mini" ];
 }

@@ -38,27 +38,21 @@ if [[ "$(id -u)" -ne 0 ]]; then
     exit 1
 fi
 
-# Determine the target user based on profile
+# Determine the target user - find the single user in /Users
 determine_user() {
-    if [[ "$PROFILE" == "mini" ]]; then
-        # Mini profile always uses "mini" user (created by nix-darwin)
-        echo "mini"
-    else
-        # For develop/ios-builder profiles, find the single user in /Users (excluding system dirs)
-        local users
-        users=$(ls -1 /Users | grep -v "^Shared$" | grep -v "^\." | grep -v "^Guest$")
-        local user_count
-        user_count=$(echo "$users" | wc -l | tr -d ' ')
+    local users
+    users=$(ls -1 /Users | grep -v "^Shared$" | grep -v "^\." | grep -v "^Guest$")
+    local user_count
+    user_count=$(echo "$users" | wc -l | tr -d ' ')
 
-        if [[ "$user_count" -eq 1 ]]; then
-            echo "$users"
-        elif [[ -n "$SUDO_USER" ]]; then
-            echo "$SUDO_USER"
-        else
-            log_error "Could not determine user for $PROFILE profile"
-            log_error "Found users: $users"
-            exit 1
-        fi
+    if [[ "$user_count" -eq 1 ]]; then
+        echo "$users"
+    elif [[ -n "$SUDO_USER" ]]; then
+        echo "$SUDO_USER"
+    else
+        log_error "Could not determine user for $PROFILE profile"
+        log_error "Found users: $users"
+        exit 1
     fi
 }
 

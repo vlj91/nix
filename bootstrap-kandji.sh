@@ -80,20 +80,14 @@ wait_for_console_user() {
 # Main
 log_info "Kandji bootstrap starting with profile: $PROFILE"
 
-# Determine target user based on profile
-if [[ "$PROFILE" == "mini" ]]; then
-    # Mini profile always uses "mini" user (created by nix-darwin)
-    TARGET_USER="mini"
+# Determine target user - find single user or wait for console user
+if TARGET_USER=$(find_single_user); then
+    log_info "Found single user: $TARGET_USER"
+elif wait_for_console_user; then
+    TARGET_USER="$CONSOLE_USER"
 else
-    # Develop/ios-builder profiles: try to find single user, or wait for console user
-    if TARGET_USER=$(find_single_user); then
-        log_info "Found single user: $TARGET_USER"
-    elif wait_for_console_user; then
-        TARGET_USER="$CONSOLE_USER"
-    else
-        log_error "Could not determine user for $PROFILE profile"
-        exit 1
-    fi
+    log_error "Could not determine user for $PROFILE profile"
+    exit 1
 fi
 
 log_info "Target user: $TARGET_USER"
