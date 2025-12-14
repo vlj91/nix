@@ -23,5 +23,6 @@ in
   environment.systemPackages = [
     pkgs.orchard
     pkgs.colima
+    pkgs.tailscale
   ];
 }

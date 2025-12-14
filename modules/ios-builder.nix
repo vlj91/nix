@@ -6,5 +6,6 @@
   # Install tart for macOS virtualization
   environment.systemPackages = [
     pkgs.tart
+    pkgs.tailscale
   ];
 }
