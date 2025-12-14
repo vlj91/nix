@@ -22,11 +22,12 @@ in
   # Create the mini user
   users.users.mini = {
     name = "mini";
+    uid = 501;
     home = "/Users/mini";
     shell = pkgs.zsh;
     description = "Mini User";
   };
 
-  # Ensure mini user is in admin group
+  # Ensure nix-darwin manages this user
   users.knownUsers = [ "mini" ];
 }
