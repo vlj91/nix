@@ -54,7 +54,7 @@ apply_updates() {
     git pull
 
     log_info "Rebuilding nix-darwin with profile: $profile"
-    darwin-rebuild switch --flake ".#$profile"
+    darwin-rebuild switch --flake ".#$profile" --impure
 
     log_info "Update complete!"
 }

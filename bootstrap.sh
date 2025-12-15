@@ -168,9 +168,9 @@ cd "$NIX_CONFIG_DIR"
 # First time setup - need to bootstrap nix-darwin
 if ! command -v darwin-rebuild &>/dev/null; then
     log_info "First time setup - bootstrapping nix-darwin..."
-    nix run nix-darwin -- switch --flake ".#$PROFILE"
+    nix run nix-darwin -- switch --flake ".#$PROFILE" --impure
 else
-    darwin-rebuild switch --flake ".#$PROFILE"
+    darwin-rebuild switch --flake ".#$PROFILE" --impure
 fi
 
 # Install auto-update daemon
@@ -182,4 +182,4 @@ log_info "Profile '$PROFILE' has been activated."
 log_info ""
 log_info "Next steps:"
 log_info "  1. Restart your terminal to apply shell changes"
-log_info "  2. Run 'sudo darwin-rebuild switch --flake /etc/nix-darwin#$PROFILE' to apply future changes"
+log_info "  2. Run 'sudo darwin-rebuild switch --flake /etc/nix-darwin#$PROFILE --impure' to apply future changes"

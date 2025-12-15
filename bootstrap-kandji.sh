@@ -179,9 +179,9 @@ cd "$NIX_CONFIG_DIR"
 
 if ! command -v darwin-rebuild &>/dev/null; then
     log_info "First time setup - bootstrapping nix-darwin..."
-    nix run nix-darwin -- switch --flake ".#$PROFILE"
+    nix run nix-darwin -- switch --flake ".#$PROFILE" --impure
 else
-    darwin-rebuild switch --flake ".#$PROFILE"
+    darwin-rebuild switch --flake ".#$PROFILE" --impure
 fi
 
 # Install auto-update daemon
