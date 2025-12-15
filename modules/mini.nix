@@ -17,7 +17,7 @@ let
     else ../username.local;
   username = if builtins.pathExists usernameFile
     then lib.strings.trim (builtins.readFile usernameFile)
-    else "admin";
+    else "runner";
 in
 {
   # Set hostname to mini-${serial_number}
