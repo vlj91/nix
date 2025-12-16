@@ -20,6 +20,10 @@ let
     else "runner";
 in
 {
+  # Disable Homebrew for mini profile - not needed, all packages come from Nix
+  nix-homebrew.enable = lib.mkForce false;
+  homebrew.enable = lib.mkForce false;
+
   # Set hostname to mini-${serial_number}
   networking = {
     hostName = hostname;
