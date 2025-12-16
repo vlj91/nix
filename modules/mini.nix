@@ -44,14 +44,14 @@ in
   system.activationScripts.postActivation.text = ''
     echo "Configuring podman..."
     # Initialize podman machine if not exists
-    if ! sudo -u ${username} podman machine list 2>/dev/null | grep -q "podman-machine-default"; then
+    if ! sudo -u ${username} ${pkgs.podman}/bin/podman machine list 2>/dev/null | grep -q "podman-machine-default"; then
       echo "Initializing podman machine..."
-      sudo -u ${username} podman machine init || true
+      sudo -u ${username} ${pkgs.podman}/bin/podman machine init || true
     fi
     # Start podman machine if not running
-    if ! sudo -u ${username} podman machine list 2>/dev/null | grep -q "Running"; then
+    if ! sudo -u ${username} ${pkgs.podman}/bin/podman machine list 2>/dev/null | grep -q "Running"; then
       echo "Starting podman machine..."
-      sudo -u ${username} podman machine start || true
+      sudo -u ${username} ${pkgs.podman}/bin/podman machine start || true
     fi
   '';
 }
