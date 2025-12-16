@@ -43,15 +43,15 @@ in
   # Initialize and start podman machine on activation
   system.activationScripts.postActivation.text = ''
     echo "Configuring podman..."
-    # Initialize podman machine if not exists
-    if ! sudo -u ${username} ${pkgs.podman}/bin/podman machine list 2>/dev/null | grep -q "podman-machine-default"; then
+    # Initialize podman machine if not exists (-H sets HOME to target user's home)
+    if ! sudo -H -u ${username} ${pkgs.podman}/bin/podman machine list 2>/dev/null | grep -q "podman-machine-default"; then
       echo "Initializing podman machine..."
-      sudo -u ${username} ${pkgs.podman}/bin/podman machine init || true
+      sudo -H -u ${username} ${pkgs.podman}/bin/podman machine init || true
     fi
     # Start podman machine if not running
-    if ! sudo -u ${username} ${pkgs.podman}/bin/podman machine list 2>/dev/null | grep -q "Running"; then
+    if ! sudo -H -u ${username} ${pkgs.podman}/bin/podman machine list 2>/dev/null | grep -q "Running"; then
       echo "Starting podman machine..."
-      sudo -u ${username} ${pkgs.podman}/bin/podman machine start || true
+      sudo -H -u ${username} ${pkgs.podman}/bin/podman machine start || true
     fi
   '';
 }
