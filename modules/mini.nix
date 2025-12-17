@@ -40,6 +40,30 @@ in
     pkgs.qemu
   ];
 
+  # Run Orchard controller as launchd agent
+  launchd.user.agents.orchard-controller = {
+    description = "Orchard controller for Tart VMs";
+
+    # Path to the orchard binary
+    path = [ pkgs.orchard ];
+
+    serviceConfig = {
+      # Run on startup
+      RunAtLoad = true;
+      KeepAlive = true;
+
+      # Logging configuration
+      StandardOutPath = "/tmp/orchard-controller.out";
+      StandardErrorPath = "/tmp/orchard-controller.err";
+
+      ProgramArguments = [
+        "${pkgs.orchard}/bin/orchard"
+        "controller"
+        "run"
+      ];
+    };
+  };
+
   # Initialize and start podman machine on activation
   system.activationScripts.postActivation.text = ''
     echo "Configuring podman..."
