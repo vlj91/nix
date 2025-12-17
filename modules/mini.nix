@@ -42,8 +42,6 @@ in
 
   # Run Orchard controller as launchd agent
   launchd.user.agents.orchard-controller = {
-    description = "Orchard controller for Tart VMs";
-
     # Path to the orchard binary
     path = [ pkgs.orchard ];
 
