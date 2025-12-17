@@ -40,6 +40,19 @@ in
     pkgs.qemu
   ];
 
+  # Run Tailscale daemon
+  launchd.daemons.tailscaled = {
+    serviceConfig = {
+      RunAtLoad = true;
+      KeepAlive = true;
+      StandardOutPath = "/var/log/tailscaled.out";
+      StandardErrorPath = "/var/log/tailscaled.err";
+      ProgramArguments = [
+        "${pkgs.tailscale}/bin/tailscaled"
+      ];
+    };
+  };
+
   # Run Orchard controller as launchd agent
   launchd.user.agents.orchard-controller = {
     # Path to the orchard binary
@@ -64,6 +77,21 @@ in
 
   # Initialize and start podman machine on activation
   system.activationScripts.postActivation.text = ''
+    echo "Configuring Tailscale..."
+    # Authenticate Tailscale if auth key exists and not already connected
+    if [ -f /etc/tailscale/keys/ephemeral ]; then
+      # Wait briefly for tailscaled to be ready
+      sleep 2
+      if ! ${pkgs.tailscale}/bin/tailscale status --json 2>/dev/null | grep -q '"BackendState":"Running"'; then
+        echo "Authenticating Tailscale with ephemeral key..."
+        ${pkgs.tailscale}/bin/tailscale up --authkey="$(cat /etc/tailscale/keys/ephemeral)" --reset || true
+      else
+        echo "Tailscale already connected"
+      fi
+    else
+      echo "Warning: Tailscale auth key not found at /etc/tailscale/keys/ephemeral"
+    fi
+
     echo "Configuring podman..."
     # Initialize podman machine if not exists (-H sets HOME to target user's home)
     if ! sudo -H -u ${username} ${pkgs.podman}/bin/podman machine list 2>/dev/null | grep -q "podman-machine-default"; then
