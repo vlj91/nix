@@ -17,7 +17,7 @@ let
     else ../username.local;
   username = if builtins.pathExists usernameFile
     then lib.strings.trim (builtins.readFile usernameFile)
-    else "runner";
+    else "admin";
 in
 {
   # Disable Homebrew for mini profile - not needed, all packages come from Nix
