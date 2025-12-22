@@ -157,6 +157,31 @@ if [[ "$PROFILE" == "mini" ]]; then
     log_info "Hostname will be set to: $HOSTNAME"
 fi
 
+# Configure Orchard for ios-builder profile
+if [[ "$PROFILE" == "ios-builder" ]]; then
+    log_info "Configuring Orchard for ios-builder profile..."
+
+    if [[ ! -f "$NIX_CONFIG_DIR/orchard-token.local" ]]; then
+        log_warn "Orchard bootstrap token not found"
+        read -p "Enter Orchard bootstrap token: " ORCHARD_TOKEN
+        echo "$ORCHARD_TOKEN" > "$NIX_CONFIG_DIR/orchard-token.local"
+        chmod 600 "$NIX_CONFIG_DIR/orchard-token.local"
+        log_info "Orchard token saved"
+    else
+        log_info "Orchard token already configured"
+    fi
+
+    if [[ ! -f "$NIX_CONFIG_DIR/orchard-controller.local" ]]; then
+        log_warn "Orchard controller hostname not found"
+        read -p "Enter Orchard controller hostname: " ORCHARD_CONTROLLER
+        echo "$ORCHARD_CONTROLLER" > "$NIX_CONFIG_DIR/orchard-controller.local"
+        chmod 600 "$NIX_CONFIG_DIR/orchard-controller.local"
+        log_info "Orchard controller hostname saved"
+    else
+        log_info "Orchard controller already configured"
+    fi
+fi
+
 # Save current profile
 echo "$PROFILE" > "$NIX_CONFIG_DIR/.current-profile"
 

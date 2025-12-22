@@ -1,6 +1,8 @@
 # Machine-specific configuration
 hostname.local
 username.local
+orchard-token.local
+orchard-controller.local
 
 # Nix build outputs
 result

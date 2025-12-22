@@ -1,0 +1,14 @@
+# Orchard Bootstrap Token Template
+#
+# Copy this file to orchard-token.local and replace with your actual token:
+#   cp orchard-token.local.template orchard-token.local
+#
+# Then edit orchard-token.local with your bootstrap token from Orchard:
+#   nano orchard-token.local
+#
+# The token should look like:
+#   orchard-bootstrap-token-v0.xxxxx.xxxxx.xxxxx
+#
+# DO NOT commit orchard-token.local to git - it's already in .gitignore
+
+your-orchard-bootstrap-token-here

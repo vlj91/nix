@@ -1,0 +1,16 @@
+# Orchard Controller Hostname Template
+#
+# Copy this file to orchard-controller.local and replace with your actual hostname:
+#   cp orchard-controller.local.template orchard-controller.local
+#
+# Then edit orchard-controller.local with your controller hostname:
+#   nano orchard-controller.local
+#
+# The hostname should be a fully qualified domain name or IP address:
+#   controller.example.com
+#   or
+#   192.168.1.100
+#
+# DO NOT commit orchard-controller.local to git - it's already in .gitignore
+
+your-orchard-controller-hostname-here
